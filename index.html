@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pune Dating Spots</title>
+    <title>Pune Date Spots</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -236,6 +236,11 @@
         .button.ghost {
             background: rgba(16, 17, 20, 0.06);
             color: var(--text);
+        }
+
+        html[data-theme="dark"] .button.ghost {
+            background: rgba(243, 245, 247, 0.08);
+            border: 1px solid rgba(243, 245, 247, 0.12);
         }
 
         .filter-input {
@@ -581,8 +586,8 @@
     <div class="container">
         <header>
             <div class="header-text">
-                <h1>Pune Dating Spots</h1>
-                <p class="subtitle">Search by area, vibe, and budget—save your favorites for later.</p>
+                <h1>Find a Date Spot in Pune</h1>
+                <p class="subtitle">Search by area, vibe, and budget, save your favorites for later <3 </p>
             </div>
             <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
                 <span class="theme-dot" aria-hidden="true"></span>
@@ -595,7 +600,7 @@
                 <input type="text"
                        class="filter-input"
                        id="queryFilter"
-                       placeholder="Search by place or area (e.g., Koregaon Park, Kothrud, rooftop, garden...)"
+                       placeholder="Search by place or area (e.g., Koregaon Park, rooftop...)"
                        autocomplete="off">
 
                 <select class="filter-input" id="typeFilter">
