@@ -17,6 +17,23 @@
             --shadow: 0 10px 30px rgba(16, 17, 20, 0.08);
             --accent: #ff3d6e;
             --accentSoft: rgba(255, 61, 110, 0.12);
+            --bgBlob1: rgba(255, 61, 110, 0.18);
+            --bgBlob2: rgba(255, 61, 110, 0.12);
+            --bgBlob3: rgba(16, 17, 20, 0.10);
+        }
+
+        html[data-theme="dark"] {
+            --bg: #0f1115;
+            --card: #151923;
+            --text: #f3f5f7;
+            --muted: rgba(243, 245, 247, 0.68);
+            --stroke: rgba(243, 245, 247, 0.12);
+            --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+            --accent: #ff4d7d;
+            --accentSoft: rgba(255, 77, 125, 0.16);
+            --bgBlob1: rgba(255, 77, 125, 0.22);
+            --bgBlob2: rgba(255, 77, 125, 0.14);
+            --bgBlob3: rgba(243, 245, 247, 0.10);
         }
 
         * {
@@ -45,6 +62,63 @@
             color: var(--text);
         }
 
+        .bg-anim {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-anim .blob {
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            filter: blur(55px);
+            opacity: 0.85;
+            transform: translate3d(0,0,0);
+            mix-blend-mode: multiply;
+            animation: floatBlob 18s ease-in-out infinite;
+        }
+
+        html[data-theme="dark"] .bg-anim .blob {
+            mix-blend-mode: screen;
+            opacity: 0.55;
+        }
+
+        .bg-anim .blob.b1 {
+            background: var(--bgBlob1);
+            top: -160px;
+            left: -180px;
+            animation-duration: 20s;
+        }
+
+        .bg-anim .blob.b2 {
+            background: var(--bgBlob2);
+            bottom: -200px;
+            right: -220px;
+            animation-duration: 24s;
+            animation-delay: -4s;
+        }
+
+        .bg-anim .blob.b3 {
+            background: var(--bgBlob3);
+            top: 30%;
+            left: 55%;
+            width: 440px;
+            height: 440px;
+            animation-duration: 28s;
+            animation-delay: -10s;
+        }
+
+        @keyframes floatBlob {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            35% { transform: translate3d(60px, 30px, 0) scale(1.08); }
+            70% { transform: translate3d(-30px, 70px, 0) scale(0.98); }
+            100% { transform: translate3d(0, 0, 0) scale(1); }
+        }
+
         .container {
             max-width: 980px;
             margin: 0 auto;
@@ -53,6 +127,41 @@
         header {
             text-align: left;
             margin: 6px 0 18px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .header-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 999px;
+            padding: 10px 12px;
+            background: rgba(16, 17, 20, 0.06);
+            border: 1px solid rgba(16, 17, 20, 0.06);
+            color: var(--text);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        html[data-theme="dark"] .theme-toggle {
+            background: rgba(243, 245, 247, 0.08);
+            border: 1px solid rgba(243, 245, 247, 0.12);
+        }
+
+        .theme-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 0 4px var(--accentSoft);
         }
 
         h1 {
@@ -77,7 +186,7 @@
 
         .toolbar {
             display: grid;
-            grid-template-columns: 2.2fr 1fr 1fr 1fr auto;
+            grid-template-columns: 2.2fr 1fr 1fr 1fr;
             gap: 12px;
             align-items: center;
         }
@@ -131,18 +240,54 @@
 
         .filter-input {
             width: 100%;
-            padding: 13px 14px;
-            font-size: 1.02em;
+            padding: 10px 12px;
+            font-size: 1em;
             border: 1px solid var(--stroke);
-            border-radius: 10px;
+            border-radius: 12px;
             outline: none;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
-            background: white;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .filter-input {
+            background: rgba(0, 0, 0, 0.18);
         }
 
         .filter-input:focus {
             border-color: rgba(255, 61, 110, 0.6);
             box-shadow: 0 0 0 4px var(--accentSoft);
+        }
+
+        select.filter-input {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 38px;
+            background-image:
+                linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+            background-position:
+                calc(100% - 18px) 50%,
+                calc(100% - 12px) 50%;
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+        }
+
+        /* Improve native dropdown readability in dark mode (browser support varies). */
+        html[data-theme="dark"] select.filter-input,
+        html[data-theme="dark"] select.filter-input option,
+        html[data-theme="dark"] select.filter-input optgroup {
+            background-color: #151923;
+            color: #f3f5f7;
+        }
+
+        html[data-theme="dark"] select.filter-input option:checked {
+            background-color: rgba(255, 77, 125, 0.22);
+            color: #f3f5f7;
+        }
+
+        .filter-section {
+            backdrop-filter: blur(10px);
         }
 
         .cards-grid {
@@ -218,12 +363,12 @@
             right: 14px;
             border: none;
             border-radius: 999px;
-            width: 42px;
-            height: 42px;
+            width: 34px;
+            height: 34px;
             cursor: pointer;
-            background: #f1f3f5;
-            color: #2d3436;
-            font-size: 18px;
+            background: rgba(16, 17, 20, 0.06);
+            color: var(--text);
+            font-size: 16px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -427,10 +572,22 @@
     </style>
 </head>
 <body>
+    <div class="bg-anim" aria-hidden="true">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>Pune Dating Spots</h1>
-            <p class="subtitle">Search by area, vibe, and budget—save your favorites for later.</p>
+            <div class="header-text">
+                <h1>Pune Dating Spots</h1>
+                <p class="subtitle">Search by area, vibe, and budget—save your favorites for later.</p>
+            </div>
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+                <span class="theme-dot" aria-hidden="true"></span>
+                <span id="themeToggleLabel">Dark</span>
+            </button>
         </header>
 
         <div class="filter-section">
@@ -464,13 +621,12 @@
                     <option value="evening">Evening</option>
                     <option value="night">Night</option>
                 </select>
-
-                <button class="button ghost" id="randomBtn" type="button">Surprise me</button>
             </div>
 
             <div class="meta-row">
                 <span class="pill"><span id="resultsCount">0</span> spots</span>
                 <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="button ghost" id="randomBtn" type="button">Surprise me</button>
                     <button class="button ghost" id="showAllBtn" type="button">Show all</button>
                     <button class="button" id="toggleFavsBtn" type="button">Favorites</button>
                 </div>
@@ -1124,7 +1280,40 @@
             showDetail(pick.id);
         });
 
+        function setTheme(theme) {
+            const root = document.documentElement;
+            if (theme === 'dark') root.setAttribute('data-theme', 'dark');
+            else root.removeAttribute('data-theme');
+
+            const label = document.getElementById('themeToggleLabel');
+            if (label) label.textContent = theme === 'dark' ? 'Light' : 'Dark';
+
+            const btn = document.getElementById('themeToggle');
+            if (btn) btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+        }
+
+        function getPreferredTheme() {
+            const saved = storageGetJSON('puneDateTheme', null);
+            if (saved === 'dark' || saved === 'light') return saved;
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function initThemeToggle() {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+
+            setTheme(getPreferredTheme());
+
+            btn.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                storageSetJSON('puneDateTheme', next);
+                setTheme(next);
+            });
+        }
+
         // Initial render
+        initThemeToggle();
         renderCards();
     </script>
 </body>
