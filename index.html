@@ -329,6 +329,7 @@
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            align-items: stretch;
             gap: 25px;
             margin-bottom: 30px;
         }
@@ -336,12 +337,129 @@
         .date-card {
             background: var(--card);
             border-radius: 15px;
-            padding: 25px;
+            padding: 0;
+            overflow: hidden;
             cursor: var(--cursor-heart);
             transition: all 0.3s ease;
             border: 1px solid var(--stroke);
             box-shadow: 0 2px 10px rgba(16, 17, 20, 0.05);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-banner {
+            position: relative;
+            flex: 0 0 auto;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            overflow: hidden;
+            background: var(--stroke);
+        }
+
+        .card-banner-fallback {
+            position: absolute;
+            inset: 0;
+        }
+
+        .date-card.romantic .card-banner-fallback {
+            background: linear-gradient(
+                135deg,
+                color-mix(in srgb, var(--accent) 55%, var(--card)),
+                color-mix(in srgb, var(--accent) 22%, var(--bg))
+            );
+        }
+
+        .date-card.foodie .card-banner-fallback {
+            background: linear-gradient(
+                135deg,
+                color-mix(in srgb, #e8a317 50%, var(--card)),
+                color-mix(in srgb, #e8a317 18%, var(--bg))
+            );
+        }
+
+        .date-card.relaxing .card-banner-fallback {
+            background: linear-gradient(
+                135deg,
+                color-mix(in srgb, #3d9a6a 48%, var(--card)),
+                color-mix(in srgb, #3d9a6a 16%, var(--bg))
+            );
+        }
+
+        .date-card.cultural .card-banner-fallback {
+            background: linear-gradient(
+                135deg,
+                color-mix(in srgb, #6b5ce7 48%, var(--card)),
+                color-mix(in srgb, #6b5ce7 16%, var(--bg))
+            );
+        }
+
+        .card-banner-img {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-type--overlay {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            margin-bottom: 0;
+            background: color-mix(in srgb, var(--card) 82%, transparent);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--stroke);
+            box-shadow: 0 2px 8px rgba(16, 17, 20, 0.12);
+        }
+
+        .card-body {
+            padding: 18px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 132px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .date-card .card-title {
+            flex: 1;
+            min-width: 0;
+            margin-bottom: 0;
+            font-size: 1.35em;
+            line-height: 1.25;
+        }
+
+        .date-card .card-description {
+            font-size: 0.95em;
+        }
+
+        .date-card .card-meta {
+            margin-top: auto;
+            padding-top: 12px;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .date-card .badge {
+            padding: 5px 9px;
+            font-size: 0.82em;
+            white-space: nowrap;
+        }
+
+        .date-card .fav-button {
+            position: static;
+            flex-shrink: 0;
         }
 
         .date-card:hover {
@@ -679,6 +797,7 @@
             display: -webkit-box;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             word-break: break-word;
             hyphens: auto;
             padding: 0 2px;
@@ -753,6 +872,10 @@
 
             .cards-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .date-card .card-meta {
+                flex-wrap: wrap;
             }
             
             .detail-view {
@@ -1572,25 +1695,43 @@
             return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}`;
         }
 
+        function cardBannerHtml(idea) {
+            const photo = idea.photos && idea.photos[0];
+            const alt = escapeHTML(idea.name);
+            const imgHtml = photo
+                ? `<img class="card-banner-img" src="${escapeHTML(photo)}" alt="${alt}" loading="lazy" onerror="this.style.display='none'">`
+                : '';
+            return `
+                <div class="card-banner">
+                    <div class="card-banner-fallback" aria-hidden="true"></div>
+                    ${imgHtml}
+                    <span class="card-type card-type--overlay">${escapeHTML(idea.type)}</span>
+                </div>
+            `;
+        }
+
         function renderCards() {
             const container = document.getElementById('cardsContainer');
             const favs = getFavoritesSet();
             container.innerHTML = currentData.map(idea => `
                 <div class="date-card ${idea.type}" onclick="showDetail(${idea.id})">
-                    <span class="card-type">${idea.type}</span>
-                    <button
-                        class="fav-button ${favs.has(idea.id) ? 'is-fav' : ''}"
-                        onclick="event.stopPropagation(); toggleFav(${idea.id});"
-                        title="${favs.has(idea.id) ? 'Remove from favorites' : 'Save to favorites'}"
-                        aria-label="${favs.has(idea.id) ? 'Remove from favorites' : 'Save to favorites'}"
-                        type="button"
-                    >♥</button>
-                    <h2 class="card-title">${idea.name}</h2>
-                    <p class="card-description">${idea.description}</p>
-                    <div class="card-meta">
-                        <span class="badge">📍 ${idea.area}</span>
-                        <span class="badge">💸 ${ideaBudgetLabel(idea)}</span>
-                        <span class="badge">🕒 ${ideaBestTimeLabel(idea)}</span>
+                    ${cardBannerHtml(idea)}
+                    <div class="card-body">
+                        <div class="card-header">
+                            <h2 class="card-title">${idea.name}</h2>
+                            <button
+                                class="fav-button ${favs.has(idea.id) ? 'is-fav' : ''}"
+                                onclick="event.stopPropagation(); toggleFav(${idea.id});"
+                                title="${favs.has(idea.id) ? 'Remove from favorites' : 'Save to favorites'}"
+                                aria-label="${favs.has(idea.id) ? 'Remove from favorites' : 'Save to favorites'}"
+                                type="button"
+                            >♥</button>
+                        </div>
+                        <p class="card-description">${idea.description}</p>
+                        <div class="card-meta">
+                            <span class="badge">📍 ${idea.area}</span>
+                            <span class="badge">💸 ${ideaBudgetLabel(idea)}</span>
+                        </div>
                     </div>
                 </div>
             `).join('');
